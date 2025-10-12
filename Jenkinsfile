@@ -106,4 +106,5 @@ pipeline {
             slackSend (channel: '#jenkinscicd', color: COLOR_MAP[currentBuild.currentResult], message: "Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
             cleanWs()
         }
+    }
 }
