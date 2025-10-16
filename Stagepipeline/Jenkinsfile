@@ -1,3 +1,5 @@
+
+
 def COLOR_MAP = [
     'SUCCESS': 'good',
     'FAILURE': 'danger',
@@ -22,8 +24,18 @@ pipeline {
         NEXUS_LOGIN = 'nexuslogin'
         SONARSERVER = 'sonarserver'
         SONARSCANNER = 'sonarscanner'
+        registryCredential = 'ecr:us-west-2:awscreds'
+        appRegistry = '471112504410.dkr.ecr.us-west-2.amazonaws.com/vprofileappimg'
+        vprofileRegistry = 'https://471112504410.dkr.ecr.us-west-2.amazonaws.com'
     }
-
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    credentialsId: 'github-ssh',
+                    url: 'git@github.com:suryavanu1/vprofile-project.git'
+            }
+        }
     stages {
         stage('Build'){
             steps {
@@ -98,7 +110,24 @@ pipeline {
 		    
                 }
             
-        
+        stage('Build App Docker Image') {
+            steps {
+                script {
+                    dockerImage = docker.build("${appRegistry}:${env.BUILD_ID}", "./Docker-files/app/multistage")
+                }
+            }
+        }
+        stage('Push to ECR') {
+            steps {
+                script {
+                    docker.withRegistry("${vprofileRegistry}", "${registryCredential}") {
+                        dockerImage.push("latest")
+                        dockerImage.push("${env.BUILD_ID}")
+                        
+                    }
+                }
+            }
+        }
     }
     post {
         always {
