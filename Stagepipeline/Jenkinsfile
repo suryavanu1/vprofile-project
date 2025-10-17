@@ -1,3 +1,5 @@
+
+
 def COLOR_MAP = [
     'SUCCESS': 'good',
     'FAILURE': 'danger',
@@ -10,6 +12,10 @@ pipeline {
     tools {
         maven "MAVEN3.9"
         jdk "JDK17"
+    }
+    options {
+        skipDefaultCheckout(false) // ensure SCM is checked out
+        disableConcurrentBuilds()
     }
 
     environment {
@@ -115,11 +121,18 @@ pipeline {
                 )
             }
         }
+        stage('Verify Workspace') {
+            steps {
+                sh 'echo "Current directory:" && pwd'
+                sh 'echo "Listing files:" && ls -R'
+            }
+        }
 
         stage('Build App Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("${appRegistry}:${env.BUILD_ID}", "${WORKSPACE}/Docker-files/app/multistage")
+                    dockerImage = docker.build("${appRegistry}:${env.BUILD_ID}", "${WORKSPACE}/vprofile-project/Docker-files/app/multistage")
+
 
 
 
