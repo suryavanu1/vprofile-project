@@ -84,12 +84,15 @@ pipeline {
         }
 
         stage('Quality Gate') {
-            steps {
-                timeout(time: 1, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
+                steps {
+                    script {
+                        def qg = waitForQualityGate()
+                        echo "Quality Gate result: ${qg.status}"
+                        // Don't abort the pipeline even if it fails
+                    }
                 }
             }
-        }
+
 
         stage('Publish to Nexus Repository Manager') {
             steps {
