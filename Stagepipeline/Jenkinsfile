@@ -119,7 +119,8 @@ pipeline {
         stage('Build App Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("${appRegistry}:${env.BUILD_ID}", "vprofile-project/Docker-files/app/multistage")
+                    dockerImage = docker.build("${appRegistry}:${env.BUILD_ID}", "${WORKSPACE}/Docker-files/app/multistage")
+
 
 
                 }
